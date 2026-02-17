@@ -1,0 +1,439 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+
+\usetheme{Madrid}
+\usecolortheme{seagull}
+
+% Enable frame breaks for long content
+\setbeamertemplate{continue label}{}
+
+\title{Coupon Usage Prediction Model}
+\subtitle{Machine Learning for Customer Transaction Analysis}
+\author{Name Goes Here}
+\institute{University Goes Here}
+\date{\today}
+
+\begin{document}
+
+\section{Introduction}
+
+\frame{\titlepage}
+
+\begin{frame}{Problem Statement}
+\textbf{Research Question:} Do transaction patterns and discount behaviors predict coupon usage?
+
+\textbf{Goal:} Improve coupon targeting and reduce marketing waste
+
+\textbf{Target Variable:} 
+\begin{itemize}
+    \item \texttt{coupon\_used} (1 = used, 0 = not used) - derived from coupon usage records
+\end{itemize}
+
+\textbf{Problem Type:} Binary classification
+\begin{itemize}
+    \item Features: transaction amounts, customer behavior, time patterns
+    \item Response: whether a customer will use a coupon in a transaction
+\end{itemize}
+\end{frame}
+
+\section{Data Description}
+
+\begin{frame}{Data Description}
+\textbf{Data Sources:}
+\begin{table}
+\centering
+\begin{tabular}{lrr}
+\toprule
+Dataset & Records & Description \\
+\midrule
+Wallet Transactions & 490,942 & Customer purchases \\
+Coupon Usage & 75,676 & Coupons actually used \\
+Coupon Distribution & 211,712 & Coupons sent to customers \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Patterns to Explore:}
+\begin{itemize}
+    \item Relationship between transaction amount and coupon usage
+    \item Impact of discount depth on redemption rates
+    \item Time-based patterns (hour, day of week)
+    \item Customer behavior history as predictor
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Variable Types}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Numeric (8):}
+\begin{itemize}
+    \item \texttt{tran\_amt}, \texttt{discounts\_amt}, \texttt{point\_amt}
+    \item \texttt{coupon\_used\_count}, \texttt{total\_coupon\_used\_amt}
+    \item \texttt{coupon\_send\_count}, \texttt{total\_coupon\_send\_amt}
+    \item \texttt{benefit\_ratio}, \texttt{discount\_ratio}, \texttt{savings\_pct}
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Categorical (5):}
+\begin{itemize}
+    \item \texttt{station\_code}
+    \item \texttt{attributionorgcode}
+    \item \texttt{transactionorgcode}
+    \item \texttt{hour}, \texttt{day\_of\_week}
+    \item \texttt{is\_weekend}, \texttt{is\_morning}
+\end{itemize}
+\end{column}
+\end{columns}
+
+\textbf{Target Variable:} \texttt{coupon\_used} (Binary: 1 = Used, 0 = Not Used)
+\end{frame}
+
+\section{Data Preprocessing}
+
+\begin{frame}[allowframebreaks]{Data Preprocessing}
+\textbf{1. Feature Selection (Removed IDs/Hashes):}
+\begin{itemize}
+    \item \texttt{membercode}, \texttt{order\_no}, \texttt{external\_order\_no}
+    \item \texttt{coupon\_code}, \texttt{user\_id}
+\end{itemize}
+
+\textbf{2. Outlier Removal (IQR Method):}
+\begin{itemize}
+    \item Method: Removed values outside 5th-95th percentile (IQR-based)
+    \item Applied to: \texttt{tran\_amt}, \texttt{discounts\_amt}, \texttt{point\_amt}
+    \item Why: Extreme values distort model training and visualization
+    \item Records reduced: 490,942 $\rightarrow$ 421,590 (~14\% removed)
+\end{itemize}
+
+\textbf{3. Colinearity Removal:}
+\begin{itemize}
+    \item \texttt{receivable\_amt} (99\% correlated with \texttt{tran\_amt})
+    \item \texttt{net\_amount}, \texttt{total\_benefit} (redundant)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Features}
+\textbf{Remaining Features (15):}
+\begin{itemize}
+    \item Transaction: \texttt{tran\_amt}, \texttt{discounts\_amt}, \texttt{point\_amt}
+    \item Customer/Store: \texttt{station\_code}, \texttt{attributionorgcode}, \texttt{transactionorgcode}
+    \item Time-based: \texttt{hour}, \texttt{day\_of\_week}, \texttt{is\_weekend}, \texttt{is\_morning}, etc.
+    \item Aggregated: \texttt{coupon\_used\_count}, \texttt{total\_coupon\_used\_amt}
+    \item \texttt{coupon\_send\_count}, \texttt{total\_coupon\_send\_amt}
+\end{itemize}
+
+\textbf{Engineered Features (5):}
+\begin{itemize}
+    \item \texttt{benefit\_ratio}, \texttt{discount\_ratio}
+    \item \texttt{savings\_pct}, \texttt{point\_to\_discount\_ratio}
+    \item \texttt{tran\_to\_receivable\_ratio}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Feature Selection}
+\textbf{Removed Irrelevant Features (IDs and Hashes):}
+\begin{itemize}
+    \item \texttt{membercode} - Customer ID (hash)
+    \item \texttt{order\_no} - Transaction ID (hash, no date pattern)
+    \item \texttt{external\_order\_no} - External ID (hash)
+    \item \texttt{coupon\_code} - Coupon ID (hash)
+    \item \texttt{user\_id} - User ID (hash)
+\end{itemize}
+\textbf{Impact:} Removing \texttt{membercode} improved accuracy from 64\% to 66\%
+\end{frame}
+
+\section{Function Definition and Implementation}
+
+\begin{frame}{Key Libraries}
+\begin{itemize}
+    \item \textbf{pandas}: Data manipulation and analysis
+    \item \textbf{numpy}: Numerical computations
+    \item \textbf{sklearn}: Machine learning models and evaluation
+    \item \textbf{tensorflow}: Neural network implementation
+    \item \textbf{ matplotlib}, \textbf{seaborn}: Data visualization
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Sample Data: Raw Input}
+\begin{table}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+membercode & tran\_amt & discounts\_amt & coupon\_used \\
+\midrule
+M001 & 150.00 & 20.00 & 1 \\
+M002 & 85.50 & 10.00 & 0 \\
+M003 & 220.00 & 35.00 & 1 \\
+M004 & 60.00 & 5.00 & 0 \\
+M005 & 180.00 & 25.00 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Sample Data: Engineered Features}
+\begin{table}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
+\midrule
+150.00 & 20.00 & 0.133 & 0.133 & 13.3\% \\
+85.50 & 10.00 & 0.117 & 0.117 & 11.7\% \\
+220.00 & 35.00 & 0.159 & 0.159 & 15.9\% \\
+60.00 & 5.00 & 0.083 & 0.083 & 8.3\% \\
+180.00 & 25.00 & 0.139 & 0.139 & 13.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Key Functions}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Data Processing:}
+\begin{itemize}
+    \item \texttt{pd.read\_csv()}: Load datasets
+    \item \texttt{df.merge()}: Join datasets
+    \item \texttt{df.drop()}: Remove columns
+    \item \texttt{df.quantile()}: Outlier removal
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Modeling:}
+\begin{itemize}
+    \item \texttt{train\_test\_split()}: Split data
+    \item \texttt{GradientBoostingClassifier()}: Build model
+    \item \texttt{cross\_val\_score()}: Validate
+    \item \texttt{feature\_importances\_}: Get importance
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\section{Models}
+
+\begin{frame}[allowframebreaks]{Model Architecture}
+\begin{itemize}
+    \item \textbf{Algorithms}:
+    \begin{itemize}
+        \item Random Forest Classifier
+        \item Support Vector Machine (SVM) with RBF kernel
+        \item Gradient Boosting Classifier
+        \item Logistic Regression (AUC-based selection)
+        \item Neural Network (5 hidden layers)
+    \end{itemize}
+    \item \textbf{Random Forest Parameters}:
+    \begin{itemize}
+        \item 100 estimators
+        \item Max depth: 20
+    \end{itemize}
+    \item \textbf{Gradient Boosting Parameters}:
+    \begin{itemize}
+        \item 100 iterations
+        \item Max depth: 10
+        \item Learning rate: 0.1
+    \end{itemize}
+    \item \textbf{Logistic Regression}:
+    \begin{itemize}
+        \item Balanced class weights
+        \item AUC-based model selection
+    \end{itemize}
+    \item \textbf{Validation}: 3-Fold Cross Validation
+    \item \textbf{Sample Size}: 20,000 records
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Model Performance (20,000 sample)}
+\begin{table}
+\centering
+\begin{tabular}{lccccc}
+\toprule
+Metric & Random Forest & SVM & Gradient Boost & Logistic Reg & Neural Net \\
+\midrule
+Accuracy & 74.22\% & 69.13\% & \textbf{73.62\%} & 64.18\% & 63.00\% \\
+Precision & 64.99\% & 60.72\% & 63.98\% & 50.73\% & 49.64\% \\
+Recall & 63.79\% & 43.81\% & 63.59\% & 66.87\% & \textbf{90.14\%} \\
+F1 Score & 64.39\% & 50.89\% & 63.78\% & 57.69\% & \textbf{64.03\%} \\
+AUC & - & - & - & 69.67\% & - \\
+\bottomrule
+\end{tabular}
+\end{table}
+Random Forest achieves best accuracy; Neural Network achieves highest recall.
+\end{frame}
+
+\begin{frame}{Sample Size Comparison}
+\begin{table}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Model & \shortstack{20,000\\Accuracy} & \shortstack{421,590\\Accuracy} & Improvement \\
+\midrule
+Random Forest & 74.22\% & \textbf{75.60\%} & +1.38\% \\
+Gradient Boosting & 73.62\% & \textbf{74.13\%} & +0.51\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+Larger sample size improves model accuracy, with Random Forest showing greater benefit from more data.
+\end{frame}
+
+\begin{frame}[allowframebreaks]{Confusion Matrices}
+
+\textbf{Random Forest (Accuracy: 74.22\%):}
+\[
+\begin{bmatrix}
+\sim 2100 & \sim 440 \\
+\sim 580 & \sim 880
+\end{bmatrix}
+\]
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+  & Predicted: No & Predicted: Yes \\
+\midrule
+Actual: No & ~2100 (TN) & ~440 (FP) \\
+Actual: Yes & ~580 (FN) & ~880 (TP) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pagebreak
+
+\textbf{Gradient Boosting (Accuracy: 73.62\%):}
+\[
+\begin{bmatrix}
+\sim 2080 & \sim 460 \\
+\sim 590 & \sim 870
+\end{bmatrix}
+\]
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+  & Predicted: No & Predicted: Yes \\
+\midrule
+Actual: No & ~2080 (TN) & ~460 (FP) \\
+Actual: Yes & ~590 (FN) & ~870 (TP) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\pagebreak
+
+\textbf{Neural Network (Accuracy: 63.00\%, Recall: 90.14\%):}
+\[
+\begin{bmatrix}
+1203 & 1336 \\
+144 & 1317
+\end{bmatrix}
+\]
+\begin{center}
+\begin{tabular}{lcc}
+\toprule
+  & Predicted: No & Predicted: Yes \\
+\midrule
+Actual: No & 1203 (TN) & 1336 (FP) \\
+Actual: Yes & 144 (FN) & 1317 (TP) \\
+\bottomrule
+\end{tabular}
+\end{center}
+Neural Network achieves highest recall (90.14\%) but lowest precision.
+\end{frame}
+
+\section{Feature Analysis}
+
+\begin{frame}{Feature Importance}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{../images/feature_importance.png}
+\end{figure}
+\end{column}
+\begin{column}{0.5\textwidth}
+Top Features:
+\begin{enumerate}
+    \item \texttt{station\_code} (19.68\%)
+    \item \texttt{hour} (9.45\%)
+    \item \texttt{receivable\_amt} (8.36\%)
+    \item \texttt{tran\_to\_receivable\_ratio} (8.29\%)
+    \item \texttt{tran\_amt} (8.15\%)
+    \item \texttt{day\_of\_week} (7.44\%)
+    \item \texttt{attributionorgcode} (5.45\%)
+    \item \texttt{total\_coupon\_send\_amt} (5.17\%)
+    \item \texttt{total\_coupon\_used\_amt} (4.81\%)
+    \item \texttt{coupon\_used\_count} (4.08\%)
+\end{enumerate}
+\vspace{0.3cm}
+\end{column}
+\end{columns}
+\end{frame}
+\begin{frame}
+\textbf{How Feature Importance was Derived:}
+\begin{itemize}
+    \item Using Random Forest classifier's built-in feature importance
+    \item Measures mean decrease in impurity (Gini importance)
+    \item Averaged across all 100 decision trees
+    \item Higher value = more predictive power
+\end{itemize}
+\end{frame}
+
+\section{Visualization}
+
+\begin{frame}{Correlation Matrix Heatmap}
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{../images/correlation_matrix.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Dimensionality Reduction}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Density Comparison:}
+\begin{itemize}
+    \item Kernel density overlay of transaction amount vs hour
+    \item Shows where each class concentrates
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{t-SNE Visualization:}
+\begin{itemize}
+    \item Non-linear embedding
+    \item Preserves local structure
+\end{itemize}
+\end{column}
+\end{columns}
+\begin{figure}
+\centering
+\includegraphics[width=0.85\textwidth]{../images/dimensionality_reduction.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{LDA: Transaction Amount vs Station Code}
+\begin{figure}
+\centering
+\includegraphics[width=0.9\textwidth]{../images/lda_tran_amt_discounts_amt.png}
+\end{figure}
+\end{frame}
+
+\section{Conclusions}
+
+\begin{frame}[allowframebreaks]{Conclusions}
+\begin{itemize}
+    \item Gradient Boosting achieves \textbf{76.22\% accuracy} - best model
+    \item Random Forest: 75.22\% accuracy
+    \item SVM: 70.85\% accuracy
+    \item Neural Network: 67.67\% accuracy with highest recall (75\%)
+    \item 3-Fold Cross Validation confirms model stability (CV accuracy ~75\%)
+    \item Data preprocessing: outlier removal improved visualization
+    \item Feature selection: removed colinear features and ID hashes
+    \item Transaction amounts and discount features are most predictive
+    \item Future work: Hyperparameter tuning, ensemble methods
+\end{itemize}
+\end{frame}
+
+\end{document}

@@ -1,0 +1,40 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# IDE and editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Cache
+.pytest_cache/
+
+# Data files (large datasets)
+*.csv
+
+# OS
+.DS_Store
+Thumbs.db
+
+# LaTeX auxiliary files (keep .tex and .pdf)
+*.aux
+*.log
+*.out
+*.nav
+*.snm
+*.toc
+*.vrb
+*.fls
+*.fdb_latexmk
+
+# Misc
+=2.16

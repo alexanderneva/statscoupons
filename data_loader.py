@@ -100,15 +100,31 @@ def load_data():
     df["savings_pct"] = (df["discounts_amt"] + df["point_amt"]) / (
         df["receivable_amt"] + 1
     )
-    df["point_to_discount_ratio"] = df["point_amt"] / (df["discounts_amt"] + 1)
     df["tran_to_receivable_ratio"] = df["tran_amt"] / (df["receivable_amt"] + 1)
 
     engineered_features = [
         "benefit_ratio",
         "discount_ratio",
         "savings_pct",
-        "point_to_discount_ratio",
         "tran_to_receivable_ratio",
+    ]
+
+    OPTIMAL_FEATURES = [
+        "station_code",
+        "attributionorgcode",
+        "hour",
+        "tran_amt",
+        "receivable_amt",
+        "tran_to_receivable_ratio",
+        "day_of_week",
+        "total_coupon_send_amt",
+        "coupon_used_count",
+        "transactionorgcode",
+        "total_coupon_used_amt",
+        "coupon_send_count",
+        "savings_pct",
+        "benefit_ratio",
+        "discount_ratio",
     ]
 
     for col in df.columns:
@@ -125,8 +141,10 @@ def load_data():
     df = df[mask]
     print(f"\nRemoved outliers: kept {len(df)} of {len(df) / 0.9:.0f} records")
 
-    feature_cols_extended = available_cols + engineered_features
-    print(f"\nUsing features ({len(feature_cols_extended)}): {feature_cols_extended}")
+    feature_cols_extended = [f for f in OPTIMAL_FEATURES if f in df.columns]
+    print(
+        f"\nUsing optimized features ({len(feature_cols_extended)}): {feature_cols_extended}"
+    )
 
     X = df[feature_cols_extended]
     y = df["coupon_used"]

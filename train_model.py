@@ -52,26 +52,32 @@ def main():
     rf_cv = cross_val_score(rf_model, X_train, y_train, cv=kfold, scoring="accuracy")
     rf_model.fit(X_train, y_train)
     y_pred_rf = rf_model.predict(X_test)
+    y_proba_rf = rf_model.predict_proba(X_test)[:, 1]
     acc_rf = accuracy_score(y_test, y_pred_rf)
     prec_rf = precision_score(y_test, y_pred_rf)
     rec_rf = recall_score(y_test, y_pred_rf)
     f1_rf = f1_score(y_test, y_pred_rf)
-    print(f"Accuracy: {acc_rf:.4f}, CV: {rf_cv.mean():.4f}")
+    auc_rf = roc_auc_score(y_test, y_proba_rf)
+    print(f"Accuracy: {acc_rf:.4f}, AUC: {auc_rf:.4f}, CV: {rf_cv.mean():.4f}")
 
     # SVM
     print("\n" + "=" * 50)
     print("Training SVM...")
-    svm_model = SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)
+    svm_model = SVC(
+        kernel="rbf", C=1.0, gamma="scale", random_state=42, probability=True
+    )
     svm_cv = cross_val_score(
         svm_model, X_train_scaled, y_train, cv=kfold, scoring="accuracy"
     )
     svm_model.fit(X_train_scaled, y_train)
     y_pred_svm = svm_model.predict(X_test_scaled)
+    y_proba_svm = svm_model.predict_proba(X_test_scaled)[:, 1]
     acc_svm = accuracy_score(y_test, y_pred_svm)
     prec_svm = precision_score(y_test, y_pred_svm)
     rec_svm = recall_score(y_test, y_pred_svm)
     f1_svm = f1_score(y_test, y_pred_svm)
-    print(f"Accuracy: {acc_svm:.4f}, CV: {svm_cv.mean():.4f}")
+    auc_svm = roc_auc_score(y_test, y_proba_svm)
+    print(f"Accuracy: {acc_svm:.4f}, AUC: {auc_svm:.4f}, CV: {svm_cv.mean():.4f}")
 
     # Gradient Boosting
     print("\n" + "=" * 50)
@@ -82,11 +88,13 @@ def main():
     gb_cv = cross_val_score(gb_model, X_train, y_train, cv=kfold, scoring="accuracy")
     gb_model.fit(X_train, y_train)
     y_pred_gb = gb_model.predict(X_test)
+    y_proba_gb = gb_model.predict_proba(X_test)[:, 1]
     acc_gb = accuracy_score(y_test, y_pred_gb)
     prec_gb = precision_score(y_test, y_pred_gb)
     rec_gb = recall_score(y_test, y_pred_gb)
     f1_gb = f1_score(y_test, y_pred_gb)
-    print(f"Accuracy: {acc_gb:.4f}, CV: {gb_cv.mean():.4f}")
+    auc_gb = roc_auc_score(y_test, y_proba_gb)
+    print(f"Accuracy: {acc_gb:.4f}, AUC: {auc_gb:.4f}, CV: {gb_cv.mean():.4f}")
 
     # Logistic Regression
     print("\n" + "=" * 50)
@@ -109,17 +117,19 @@ def main():
     print("\n" + "=" * 50)
     print("Model Comparison")
     print("=" * 50)
-    print(f"{'Model':<20} {'Acc':<8} {'Prec':<8} {'Recall':<8} {'F1':<8}")
-    print("-" * 52)
+    print(f"{'Model':<20} {'Acc':<8} {'AUC':<8} {'Prec':<8} {'Recall':<8} {'F1':<8}")
+    print("-" * 60)
     print(
-        f"{'Random Forest':<20} {acc_rf:.4f}  {prec_rf:.4f}  {rec_rf:.4f}  {f1_rf:.4f}"
-    )
-    print(f"{'SVM':<20} {acc_svm:.4f}  {prec_svm:.4f}  {rec_svm:.4f}  {f1_svm:.4f}")
-    print(
-        f"{'Gradient Boosting':<20} {acc_gb:.4f}  {prec_gb:.4f}  {rec_gb:.4f}  {f1_gb:.4f}"
+        f"{'Random Forest':<20} {acc_rf:.4f}  {auc_rf:.4f}  {prec_rf:.4f}  {rec_rf:.4f}  {f1_rf:.4f}"
     )
     print(
-        f"{'Logistic Reg':<20} {acc_lr:.4f}  {prec_lr:.4f}  {rec_lr:.4f}  {f1_lr:.4f}"
+        f"{'SVM':<20} {acc_svm:.4f}  {auc_svm:.4f}  {prec_svm:.4f}  {rec_svm:.4f}  {f1_svm:.4f}"
+    )
+    print(
+        f"{'Gradient Boosting':<20} {acc_gb:.4f}  {auc_gb:.4f}  {prec_gb:.4f}  {rec_gb:.4f}  {f1_gb:.4f}"
+    )
+    print(
+        f"{'Logistic Reg':<20} {acc_lr:.4f}  {auc_lr:.4f}  {prec_lr:.4f}  {rec_lr:.4f}  {f1_lr:.4f}"
     )
 
 

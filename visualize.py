@@ -35,20 +35,26 @@ def main():
     coupon_used_mask = y_sample == 1
     coupon_not_used_mask = y_sample == 0
 
+    tran_amt_idx = feature_names.index("tran_amt") if "tran_amt" in feature_names else 1
+    hour_idx = feature_names.index("hour") if "hour" in feature_names else 7
+
     xy_used = np.vstack(
-        [X_sample[coupon_used_mask, 1], X_sample[coupon_used_mask, 7]]
+        [X_sample[coupon_used_mask, tran_amt_idx], X_sample[coupon_used_mask, hour_idx]]
     ).T
     kde_used = KernelDensity(bandwidth=5.0)
     kde_used.fit(xy_used)
 
-    x_min, x_max = X_sample[:, 1].min(), X_sample[:, 1].max()
-    y_min, y_max = X_sample[:, 7].min(), X_sample[:, 7].max()
+    x_min, x_max = X_sample[:, tran_amt_idx].min(), X_sample[:, tran_amt_idx].max()
+    y_min, y_max = X_sample[:, hour_idx].min(), X_sample[:, hour_idx].max()
     xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
     xy_grid = np.vstack([xx.ravel(), yy.ravel()]).T
     z_used = np.exp(kde_used.score_samples(xy_grid)).reshape(xx.shape)
 
     xy_not_used = np.vstack(
-        [X_sample[coupon_not_used_mask, 1], X_sample[coupon_not_used_mask, 7]]
+        [
+            X_sample[coupon_not_used_mask, tran_amt_idx],
+            X_sample[coupon_not_used_mask, hour_idx],
+        ]
     ).T
     kde_not_used = KernelDensity(bandwidth=5.0)
     kde_not_used.fit(xy_not_used)

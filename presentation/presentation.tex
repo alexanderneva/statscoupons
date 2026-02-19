@@ -225,7 +225,7 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
         \item Support Vector Machine (SVM) with RBF kernel
         \item Gradient Boosting Classifier
         \item Logistic Regression (AUC-based selection)
-        \item Neural Network (5 hidden layers)
+        \item Neural Network (3 hidden layers: 256-128-64)
     \end{itemize}
     \item \textbf{Random Forest Parameters}:
     \begin{itemize}
@@ -251,19 +251,19 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
 \begin{frame}{Model Performance (20,000 sample)}
 \begin{table}
 \centering
-\begin{tabular}{lccccc}
+\begin{tabular}{lrrrrr}
 \toprule
 Metric & Random Forest & SVM & Gradient Boost & Logistic Reg & Neural Net \\
 \midrule
-Accuracy & 74.22\% & 69.13\% & \textbf{73.62\%} & 64.18\% & 63.00\% \\
-Precision & 64.99\% & 60.72\% & 63.98\% & 50.73\% & 49.64\% \\
-Recall & 63.79\% & 43.81\% & 63.59\% & 66.87\% & \textbf{90.14\%} \\
-F1 Score & 64.39\% & 50.89\% & 63.78\% & 57.69\% & \textbf{64.03\%} \\
-AUC & - & - & - & 69.67\% & - \\
+Accuracy & \textbf{74.20\%} & 69.83\% & 73.78\% & 62.15\% & 71.85\% \\
+AUC & \textbf{0.826} & 0.749 & 0.818 & 0.687 & 0.787 \\
+Precision & 64.66\% & 61.10\% & 64.27\% & 48.64\% & 62.29\% \\
+Recall & 64.75\% & 47.84\% & 63.52\% & 65.09\% & 58.11\% \\
+F1 Score & \textbf{64.71\%} & 53.67\% & 63.89\% & 55.68\% & 60.13\% \\
 \bottomrule
 \end{tabular}
 \end{table}
-Random Forest achieves best accuracy; Neural Network achieves highest recall.
+Random Forest achieves best accuracy and AUC. Neural Network improved with balanced class weights.
 \end{frame}
 
 \begin{frame}{Sample Size Comparison}
@@ -356,7 +356,7 @@ Neural Network achieves highest recall (90.14\%) but lowest precision.
 \begin{column}{0.5\textwidth}
 Top Features:
 \begin{enumerate}
-    \item \texttt{station\_code} (19.68\%)
+    \item \texttt{station\_code} (23.5\%)
     \item \texttt{hour} (9.45\%)
     \item \texttt{receivable\_amt} (8.36\%)
     \item \texttt{tran\_to\_receivable\_ratio} (8.29\%)
@@ -413,10 +413,10 @@ Top Features:
 \end{figure}
 \end{frame}
 
-\begin{frame}{LDA: Transaction Amount vs Station Code}
+\begin{frame}{PCA Visualization}
 \begin{figure}
 \centering
-\includegraphics[width=0.9\textwidth]{../images/lda_tran_amt_discounts_amt.png}
+\includegraphics[width=0.65\textwidth,height=0.65\textheight,keepaspectratio]{../images/pca_visualization.png}
 \end{figure}
 \end{frame}
 
@@ -424,15 +424,14 @@ Top Features:
 
 \begin{frame}[allowframebreaks]{Conclusions}
 \begin{itemize}
-    \item Gradient Boosting achieves \textbf{76.22\% accuracy} - best model
-    \item Random Forest: 75.22\% accuracy
-    \item SVM: 70.85\% accuracy
-    \item Neural Network: 67.67\% accuracy with highest recall (75\%)
-    \item 3-Fold Cross Validation confirms model stability (CV accuracy ~75\%)
-    \item Data preprocessing: outlier removal improved visualization
-    \item Feature selection: removed colinear features and ID hashes
-    \item Transaction amounts and discount features are most predictive
-    \item Future work: Hyperparameter tuning, ensemble methods
+    \item Random Forest achieves \textbf{74.20\% accuracy} with \textbf{0.826 AUC} - best model
+    \item Gradient Boosting: 73.78\% accuracy, 0.818 AUC
+    \item Neural Network: 71.85\% accuracy with balanced class weights
+    \item Feature selection: reduced from 23 to 15 features without accuracy loss
+    \item Removed zero-importance features: \texttt{point\_amt}, \texttt{point\_to\_discount\_ratio}
+    \item Top features: station\_code (23.5\%), attributionorgcode (9.4\%)
+    \item 3-Fold Cross Validation confirms model stability
+    \item Future work: XGBoost/LightGBM, more feature engineering
 \end{itemize}
 \end{frame}
 

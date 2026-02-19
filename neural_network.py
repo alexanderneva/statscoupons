@@ -8,19 +8,14 @@ def create_model(input_dim):
     model = keras.Sequential(
         [
             layers.Input(shape=(input_dim,)),
+            layers.Dense(256, activation="relu"),
+            layers.BatchNormalization(),
+            layers.Dropout(0.3),
             layers.Dense(128, activation="relu"),
             layers.BatchNormalization(),
             layers.Dropout(0.3),
             layers.Dense(64, activation="relu"),
             layers.BatchNormalization(),
-            layers.Dropout(0.3),
-            layers.Dense(32, activation="relu"),
-            layers.BatchNormalization(),
-            layers.Dropout(0.3),
-            layers.Dense(16, activation="relu"),
-            layers.BatchNormalization(),
-            layers.Dropout(0.3),
-            layers.Dense(8, activation="relu"),
             layers.Dropout(0.3),
             layers.Dense(2, activation="softmax"),
         ]
@@ -32,7 +27,7 @@ def train_nn(X_train, y_train, X_test, y_test, epochs=100, batch_size=256):
     y_train_cat = keras.utils.to_categorical(y_train.values, num_classes=2)
     y_test_cat = keras.utils.to_categorical(y_test.values, num_classes=2)
 
-    class_weights = {0: 1.0, 1: 2.0}
+    class_weights = {0: 1.0, 1: 1.0}
 
     model = create_model(X_train.shape[1])
     model.compile(

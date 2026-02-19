@@ -9,6 +9,7 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix,
     classification_report,
+    roc_auc_score,
 )
 from sklearn.preprocessing import StandardScaler
 
@@ -55,6 +56,7 @@ def main():
 
     print("\n=== Neural Network Results ===")
     print(f"Accuracy: {accuracy_score(y_test, y_pred_nn):.4f}")
+    print(f"AUC: {roc_auc_score(y_test, y_pred_proba_nn):.4f}")
     print(f"Precision: {precision_score(y_test, y_pred_nn):.4f}")
     print(f"Recall: {recall_score(y_test, y_pred_nn):.4f}")
     print(f"F1 Score: {f1_score(y_test, y_pred_nn):.4f}")

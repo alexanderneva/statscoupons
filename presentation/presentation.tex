@@ -248,6 +248,35 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Neural Network: Class Weights}
+\textbf{Impact of Class Weights on Neural Network:}
+
+\bigskip
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Naive (Unbalanced) Weights: \{0:1, 1:2\}}
+\begin{itemize}
+    \item Accuracy: 62.92\%
+    \item Recall: \textbf{92.06\%}
+    \item Precision: 49.59\%
+    \item Result: Predicts almost everything as positive
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Balanced Weights: \{0:1, 1:1\}}
+\begin{itemize}
+    \item Accuracy: \textbf{71.85\%}
+    \item Recall: 58.11\%
+    \item Precision: \textbf{62.29\%}
+    \item Result: Better balance between precision and recall
+\end{itemize}
+\end{column}
+\end{columns}
+
+\bigskip
+Key insight: Naive weights over-predict positives, achieving high recall but low precision. Balanced weights improve overall accuracy and create a more useful model.
+\end{frame}
+
 \begin{frame}{Model Performance (20,000 sample)}
 \begin{table}
 \centering
@@ -323,11 +352,11 @@ Actual: Yes & ~590 (FN) & ~870 (TP) \\
 
 \pagebreak
 
-\textbf{Neural Network (Accuracy: 63.00\%, Recall: 90.14\%):}
+\textbf{Neural Network (Accuracy: 71.85\%, Recall: 58.11\%):}
 \[
 \begin{bmatrix}
-1203 & 1336 \\
-144 & 1317
+2025 & 514 \\
+612 & 849
 \end{bmatrix}
 \]
 \begin{center}
@@ -335,12 +364,12 @@ Actual: Yes & ~590 (FN) & ~870 (TP) \\
 \toprule
   & Predicted: No & Predicted: Yes \\
 \midrule
-Actual: No & 1203 (TN) & 1336 (FP) \\
-Actual: Yes & 144 (FN) & 1317 (TP) \\
+Actual: No & 2025 (TN) & 514 (FP) \\
+Actual: Yes & 612 (FN) & 849 (TP) \\
 \bottomrule
 \end{tabular}
 \end{center}
-Neural Network achieves highest recall (90.14\%) but lowest precision.
+Neural Network improved with balanced class weights.
 \end{frame}
 
 \section{Feature Analysis}
@@ -426,7 +455,7 @@ Top Features:
 \begin{itemize}
     \item Random Forest achieves \textbf{74.20\% accuracy} with \textbf{0.826 AUC} - best model
     \item Gradient Boosting: 73.78\% accuracy, 0.818 AUC
-    \item Neural Network: 71.85\% accuracy with balanced class weights
+    \item Neural Network: 71.85\% accuracy with balanced class weights (3 layers: 256-128-64)
     \item Feature selection: reduced from 23 to 15 features without accuracy loss
     \item Removed zero-importance features: \texttt{point\_amt}, \texttt{point\_to\_discount\_ratio}
     \item Top features: station\_code (23.5\%), attributionorgcode (9.4\%)

@@ -83,4 +83,8 @@ uv run python tune_model.py
 
 ## References
 
-Academic papers on O2O coupon prediction using XGBoost/LightGBM report AUC values of 0.95-0.99 with extensive feature engineering (26+ domain-specific features).
+Academic papers on O2O coupon prediction using XGBoost/LightGBM report AUC values of 0.95-0.99 with extensive feature engineering (26+ domain-specific features):
+
+- [Forecast of O2O Coupon Consumption Based on XGBoost Model](https://francis-press.com/uploads/papers/mStT9Od4Whk7vxM7mDPWAIOfiOWNyg6rOYcwkyxG.pdf)
+- [MDBIF: A Multi-Dimensional Feature and Boosting Integration Framework](https://www.clausiuspress.com/assets/default/article/2025/10/15/article_1760503641.pdf)
+- [A Novel Digital Coupon Use Prediction Model Based on XGBoost](https://www.atlantis-press.com/proceedings/icmesd-18/25898711)

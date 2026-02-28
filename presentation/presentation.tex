@@ -31,6 +31,15 @@
 
 \frame{\titlepage}
 
+\begin{frame}{Repository}
+\bigskip
+\textbf{GitHub Repository:}\\
+\url{https://github.com/alexanderneva/statscoupons}
+\bigskip
+\bigskip
+All code, data, and presentation materials are available in this repository.
+\end{frame}
+
 \begin{frame}{Problem Statement}
 \textbf{Research Question:} Do transaction patterns and discount behaviors predict coupon usage?
 
@@ -148,7 +157,6 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \begin{column}{0.5\textwidth}
 \textbf{Modeling:}
 \begin{itemize}
-    \item \texttt{train\_test\_split()}: Split data
     \item \texttt{GradientBoostingClassifier()}: Build model
     \item \texttt{cross\_val\_score()}: Validate
     \item \texttt{feature\_importances\_}: Get importance
@@ -388,33 +396,63 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \section{Models}
 
 \begin{frame}[allowframebreaks]{Model Architecture}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Random Forest Parameters:}
 \begin{itemize}
-    \item \textbf{Algorithms}:
-    \begin{itemize}
-        \item Random Forest Classifier
-        \item Support Vector Machine (SVM) with RBF kernel
-        \item Gradient Boosting Classifier
-        \item Logistic Regression (AUC-based selection)
-        \item Neural Network (3 hidden layers: 256-128-64)
-    \end{itemize}
-    \item \textbf{Random Forest Parameters}:
-    \begin{itemize}
-        \item 100 estimators
-        \item Max depth: 20
-    \end{itemize}
-    \item \textbf{Gradient Boosting Parameters}:
-    \begin{itemize}
-        \item 100 iterations
-        \item Max depth: 10
-        \item Learning rate: 0.1
-    \end{itemize}
-    \item \textbf{Logistic Regression}:
-    \begin{itemize}
-        \item Balanced class weights
-        \item AUC-based model selection
-    \end{itemize}
-    \item \textbf{Validation}: 3-Fold Cross Validation
-    \item \textbf{Sample Size}: 20,000 records
+    \item n\_estimators=100
+    \item max\_depth=20
+    \item min\_samples\_split=15
+    \item min\_samples\_leaf=3
+    \item max\_features="sqrt"
+\end{itemize}
+\bigskip
+\textbf{Gradient Boosting Parameters:}
+\begin{itemize}
+    \item max\_iter=100
+    \item max\_depth=10
+    \item learning\_rate=0.1
+\end{itemize}
+\bigskip
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{SVM Parameters:}
+\begin{itemize}
+    \item kernel="rbf"
+    \item C=1.0
+    \item gamma="scale"
+\end{itemize}
+\textbf{Logistic Regression Parameters:}
+\begin{itemize}
+    \item max\_iter=1000
+    \item solver="lbfgs"
+    \item class\_weight="balanced"
+\end{itemize}
+\bigskip
+\textbf{Data Split: Train/Test: 80/20, Stratified}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Neural Network Architecture}
+\textbf{Neural Network Details:}
+\begin{itemize}
+    \item Input Layer: 15 features
+    \item Hidden Layer 1: 256 neurons (ReLU)
+    \item BatchNormalization + Dropout(0.3)
+    \item Hidden Layer 2: 128 neurons (ReLU)
+    \item BatchNormalization + Dropout(0.3)
+    \item Hidden Layer 3: 64 neurons (ReLU)
+    \item BatchNormalization + Dropout(0.3)
+    \item Output Layer: 2 neurons (Softmax)
+\end{itemize}
+\bigskip
+\textbf{Training:}
+\begin{itemize}
+    \item Optimizer: Adam (lr=0.001)
+    \item Loss: Categorical Crossentropy
+    \item Validation Split: 10\%
+    \item Batch Size: 256
 \end{itemize}
 \end{frame}
 

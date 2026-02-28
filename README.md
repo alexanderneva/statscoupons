@@ -16,6 +16,8 @@ This will extract the following CSV files:
 - `cust_coupon_detail_used_train.csv` - Coupon usage records
 - `cust_coupon_detail_send_train.csv` - Coupon distribution records
 
+We used [uv](https://docs.astral.sh/uv/) for this project. It defaulted to `python` version 3.12. The dependecies can be found in `pyproject.toml`.
+
 ## Data Sources
 
 | Dataset | Records | Description |
@@ -26,22 +28,28 @@ This will extract the following CSV files:
 
 ## Features
 
-- **Original**: Transaction amounts, customer IDs, store codes, time features
+- **Original**: Transaction amounts, customer IDs, station prefix, time features
 - **Engineered**: Benefit ratios, discount ratios, savings percentages
 - **Aggregated**: Coupon usage counts and amounts per customer (from merged data)
 - **Optimized**: Reduced from 23 to 15 features based on importance analysis
+- **Key finding**: Replaced station_code (18K values) with station_prefix (19 values) for better generalization
 
 ### Feature Selection
 
 Top features by importance:
-1. station_code (23.5%)
-2. attributionorgcode (9.4%)
-3. hour (7.5%)
-4. tran_amt (7.0%)
-5. receivable_amt (6.9%)
-6. tran_to_receivable_ratio (6.7%)
+1. hour (15.4%)
+2. tran_to_receivable_ratio (10.5%)
+3. tran_amt (10.5%)
+4. receivable_amt (10.2%)
+5. day_of_week (9.3%)
+6. attribtuionorgcode (7.5%)
 
 Removed: point_amt, point_to_discount_ratio (zero importance)
+Encoded: station_code to station_prefix_encoded
+
+### Features Used
+
+- ['station_prefix_encoded', 'attributionorgcode', 'hour', 'tran_amt', 'receivable_amt', 'tran_to_receivable_ratio', 'day_of_week', 'total_coupon_send_amt', 'coupon_used_count', 'transactionorgcode', 'total_coupon_used_amt', 'coupon_send_count', 'savings_pct', 'benefit_ratio', 'discount_ratio']
 
 ## Model Results (20,000 sample)
 
@@ -55,7 +63,6 @@ Removed: point_amt, point_to_discount_ratio (zero importance)
 
 ## Optimizations Applied
 
-- Best subset selection analysis
 - Class weight balancing
 - Hyperparameter tuning
 - Feature importance-based selection
@@ -66,19 +73,40 @@ Removed: point_amt, point_to_discount_ratio (zero importance)
 # Train the model
 uv run python train_model.py
 
+# Run neural netowrk
+uv run python train_nn.py
+
 # Generate visualizations (LDA, t-SNE, feature importance)
 uv run python visualize.py
 
-# Run tuned model
+# Generate PCA visualization (excluding time features)
+uv run python visualize_pca.py
+
+# Generate confusion matrix plots
+uv run python visualize_confusion_matrices.py
+
+# Tune model
 uv run python tune_model.py
+
+# Employ Grid search
+uv run grid_search.py
+
+# Run subset selection
+uv run subset_selection.py
 ```
+
+## Regarding the Neural Network
+
+- layers can be added or taken away by editing the `neural_network.py` file in the `train_nn()` function. `train_nn.py` calls on this function
+- GPU enabled for tensorflow
 
 ## Output Files
 
 - `dimensionality_reduction.png` - Density comparison and t-SNE visualizations
-- `pca_visualization.png` - PCA visualization of the data
+- `pca_visualization.png` - PCA visualization (transaction/behavioral features only)
 - `feature_importance.png` - Random Forest feature importance chart
 - `correlation_matrix.png` - Feature correlation heatmap
+- `confusion_matrices.png` - Confusion matrices for all models
 - `presentation.tex` - Beamer presentation (compile with pdflatex)
 
 ## References

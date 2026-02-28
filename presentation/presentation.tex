@@ -4,6 +4,14 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{booktabs}
+\usepackage{listings}
+
+\lstdefinestyle{pandas}{
+  basicstyle=\ttfamily\tiny,
+  breaklines=true,
+  frame=none,
+  backgroundcolor=\color{white},
+}
 
 \usetheme{Madrid}
 \usecolortheme{seagull}
@@ -92,38 +100,28 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \textbf{Target Variable:} \texttt{coupon\_used} (Binary: 1 = Used, 0 = Not Used)
 \end{frame}
 
-\begin{frame}{Sample Data: Raw Input}
-\begin{table}
-\centering
-\begin{tabular}{lrrr}
-\toprule
-membercode & tran\_amt & discounts\_amt & coupon\_used \\
-\midrule
-M001 & 150.00 & 20.00 & 1 \\
-M002 & 85.50 & 10.00 & 0 \\
-M003 & 220.00 & 35.00 & 1 \\
-M004 & 60.00 & 5.00 & 0 \\
-M005 & 180.00 & 25.00 & 1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{frame}{Sample Data: Raw Input (Pandas)}
+\bigskip
+\bigskip
+\begin{block}{Code}
+\texttt{df = pd.read\_csv('cust\_wallet\_detail\_train.csv')}\\
+\texttt{df = df.merge(coupon\_used\_agg, on='membercode', how='left')}\\
+\texttt{df = df.merge(coupon\_send\_agg, on='membercode', how='left')}
+\end{block}
+\bigskip
+\begin{block}{pd.head(5) - Raw Data (Merged)}
+\lstset{style=pandas}
+\lstinputlisting[language=Python,firstline=0,lastline=5]{../images/pandas_raw_head.txt}
+\end{block}
 \end{frame}
 
-\begin{frame}{Sample Data: Engineered Features}
-\begin{table}
-\centering
-\begin{tabular}{lrrrr}
-\toprule
-tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
-\midrule
-150.00 & 20.00 & 0.133 & 0.133 & 13.3\% \\
-85.50 & 10.00 & 0.117 & 0.117 & 11.7\% \\
-220.00 & 35.00 & 0.159 & 0.159 & 15.9\% \\
-60.00 & 5.00 & 0.083 & 0.083 & 8.3\% \\
-180.00 & 25.00 & 0.139 & 0.139 & 13.9\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{frame}{Sample Data: Processed Features (Pandas)}
+\bigskip
+\bigskip
+\begin{block}{pd.head(5) - Processed Data}
+\lstset{style=pandas}
+\lstinputlisting[language=Python,firstline=0,lastline=5]{../images/pandas_processed_head.txt}
+\end{block}
 \end{frame}
 
 \begin{frame}{Key Libraries}
@@ -187,7 +185,7 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
 \textbf{Remaining Features (15):}
 \begin{itemize}
     \item Transaction: \texttt{tran\_amt}, \texttt{discounts\_amt}, \texttt{point\_amt}
-    \item Customer/Store: \texttt{station\_code}, \texttt{attributionorgcode}, \texttt{transactionorgcode}
+    \item Customer/Store: \texttt{station\_prefix\_encoded}, \texttt{attributionorgcode}, \texttt{transactionorgcode}
     \item Time-based: \texttt{hour}, \texttt{day\_of\_week}, \texttt{is\_weekend}, \texttt{is\_morning}, etc.
     \item Aggregated: \texttt{coupon\_used\_count}, \texttt{total\_coupon\_used\_amt}
     \item \texttt{coupon\_send\_count}, \texttt{total\_coupon\_send\_amt}
@@ -230,10 +228,12 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
 \bigskip
 \textbf{Experiment Results (Random Forest):}
 \begin{itemize}
-    \item Current (station\_code): 74.2\% accuracy
-    \item Removed station\_code: 74.4\% accuracy
-    \item Replaced with station\_prefix: \textbf{74.6\% accuracy}
+    \item With station\_code: 74.2\% accuracy
+    \item Without station\_code: 74.4\% accuracy
+    \item With station\_prefix: \textbf{74.6\% accuracy}
 \end{itemize}
+\bigskip
+\textbf{Result:} station\_prefix has lower importance (4.7\%) but improves generalization.
 \end{frame}
 
 \section{Visualization}
@@ -245,26 +245,40 @@ tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
 \end{figure}
 \end{frame}
 
-\begin{frame}{Dimensionality Reduction}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\textbf{Density Comparison:}
+\begin{frame}{Density Plot Analysis}
+\textbf{What is a Density Plot?}
 \begin{itemize}
-    \item Kernel density overlay of transaction amount vs hour
-    \item Shows where each class concentrates
+    \item Kernel density estimation (KDE) shows probability distribution
+    \item Overlay of two classes on same axes for comparison
+    \item X-axis: Transaction amount or Hour, Y-axis: Density
 \end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
-\textbf{t-SNE Visualization:}
-\begin{itemize}
-    \item Non-linear embedding
-    \item Preserves local structure
-\end{itemize}
-\end{column}
-\end{columns}
+\bigskip
 \begin{figure}
 \centering
-\includegraphics[width=0.85\textwidth]{../images/dimensionality_reduction.png}
+\includegraphics[width=0.8\textwidth]{../images/dimensionality_reduction.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}{t-SNE Visualization}
+\textbf{t-SNE (t-Distributed Stochastic Neighbor Embedding):}
+\begin{itemize}
+    \item Non-linear dimensionality reduction
+    \item Preserves local structure (similar points stay close)
+    \item Perplexity=30 used
+    \item Reveals class clusters in 2D space
+\end{itemize}
+\bigskip
+\textbf{Key Observations from Density Plot and t-SNE:}
+\begin{itemize}
+    \item Coupon users (orange) tend to have higher transaction amounts
+    \item Non-users (blue) concentrate in lower amounts
+    \item Both methods show significant class overlap
+    \item No clear linear boundary between classes
+    \item Suggests other features needed for better separation
+\end{itemize}
+\begin{figure}
+\centering
+%\includegraphics[width=0.7\textwidth]{../images/tsne_visualization.png}
 \end{figure}
 \end{frame}
 
@@ -377,15 +391,15 @@ Key insight: Naive weights over-predict positives, achieving high recall but low
 \toprule
 Metric & Random Forest & SVM & Gradient Boost & Logistic Reg & Neural Net \\
 \midrule
-Accuracy & \textbf{74.20\%} & 69.83\% & 73.78\% & 62.15\% & 71.85\% \\
-AUC & \textbf{0.826} & 0.749 & 0.818 & 0.687 & 0.787 \\
-Precision & 64.66\% & 61.10\% & 64.27\% & 48.64\% & 62.29\% \\
-Recall & 64.75\% & 47.84\% & 63.52\% & 65.09\% & 58.11\% \\
-F1 Score & \textbf{64.71\%} & 53.67\% & 63.89\% & 55.68\% & 60.13\% \\
+Accuracy & \textbf{74.60\%} & 70.80\% & 73.68\% & 60.48\% & 72.22\% \\
+AUC & \textbf{0.825} & 0.761 & 0.818 & 0.676 & 0.799 \\
+Precision & 65.40\% & 61.23\% & 63.60\% & 47.20\% & 62.70\% \\
+Recall & 64.68\% & 54.69\% & 65.30\% & 69.27\% & 59.14\% \\
+F1 Score & \textbf{65.04\%} & 57.77\% & 64.44\% & 56.14\% & 60.87\% \\
 \bottomrule
 \end{tabular}
 \end{table}
-Random Forest achieves best accuracy and AUC. Neural Network improved with balanced class weights.
+Random Forest achieves best accuracy with station\_prefix feature engineering (+0.4\% vs old station\_code).
 \end{frame}
 
 \begin{frame}{Sample Size Comparison}
@@ -423,18 +437,18 @@ Larger sample size improves model accuracy, with Random Forest showing greater b
 \begin{column}{0.5\textwidth}
 Top Features:
 \begin{enumerate}
-    \item \texttt{station\_code} (23.5\%)
-    \item \texttt{hour} (9.45\%)
-    \item \texttt{receivable\_amt} (8.36\%)
-    \item \texttt{tran\_to\_receivable\_ratio} (8.29\%)
-    \item \texttt{tran\_amt} (8.15\%)
-    \item \texttt{day\_of\_week} (7.44\%)
-    \item \texttt{attributionorgcode} (5.45\%)
-    \item \texttt{total\_coupon\_send\_amt} (5.17\%)
-    \item \texttt{total\_coupon\_used\_amt} (4.81\%)
-    \item \texttt{coupon\_used\_count} (4.08\%)
+    \item \texttt{hour} (15.4\%)
+    \item \texttt{tran\_to\_receivable\_ratio} (10.5\%)
+    \item \texttt{tran\_amt} (10.5\%)
+    \item \texttt{receivable\_amt} (10.2\%)
+    \item \texttt{day\_of\_week} (9.3\%)
+    \item \texttt{attributionorgcode} (7.5\%)
+    \item \texttt{total\_coupon\_send\_amt} (5.4\%)
+    \item \texttt{total\_coupon\_used\_amt} (4.9\%)
+    \item \texttt{coupon\_used\_count} (4.8\%)
+    \item \texttt{coupon\_send\_count} (4.7\%)
+    \item \texttt{station\_prefix\_encoded} (4.7\%)
 \end{enumerate}
-\vspace{0.3cm}
 \end{column}
 \end{columns}
 \end{frame}
@@ -446,18 +460,20 @@ Top Features:
     \item Averaged across all 100 decision trees
     \item Higher value = more predictive power
 \end{itemize}
+\bigskip
+\textbf{Key Insight:} Time features (hour, day) and transaction amounts are most predictive. Station prefix has lower feature importance (4.7\%) but improves model generalization (74.6\% accuracy vs 74.2\%).
 \end{frame}
 
 \section{Conclusions}
 
 \begin{frame}[allowframebreaks]{Conclusions}
 \begin{itemize}
-    \item Random Forest achieves \textbf{74.20\% accuracy} with \textbf{0.826 AUC} - best model
-    \item Gradient Boosting: 73.78\% accuracy, 0.818 AUC
-    \item Neural Network: 71.85\% accuracy with balanced class weights (3 layers: 256-128-64)
+    \item Random Forest achieves \textbf{74.60\% accuracy} with \textbf{0.825 AUC} - best model
+    \item Gradient Boosting: 73.68\% accuracy, 0.818 AUC
+    \item Neural Network: 72.22\% accuracy with balanced class weights
     \item Feature selection: reduced from 23 to 15 features without accuracy loss
-    \item Removed zero-importance features: \texttt{point\_amt}, \texttt{point\_to\_discount\_ratio}
-    \item Top features: station\_code (23.5\%), attributionorgcode (9.4\%)
+    \item Replaced station\_code with station\_prefix for better generalization
+    \item Top features: hour (15.4\%), tran\_to\_receivable\_ratio (10.5\%)
     \item 3-Fold Cross Validation confirms model stability
     \item Future work: XGBoost/LightGBM, more feature engineering
 \end{itemize}

@@ -147,7 +147,11 @@ def main():
     print("Saved correlation_matrix.png")
 
     print("Generating LDA scatter plot...")
-    X_2d = df[["tran_amt", "station_code"]].fillna(0).replace([np.inf, -np.inf], 0)
+    X_2d = (
+        df[["tran_amt", "station_prefix_encoded"]]
+        .fillna(0)
+        .replace([np.inf, -np.inf], 0)
+    )
     scaler = StandardScaler()
     X_2d_scaled = scaler.fit_transform(X_2d)
 

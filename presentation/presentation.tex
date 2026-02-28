@@ -31,15 +31,6 @@
 
 \frame{\titlepage}
 
-\begin{frame}{Repository}
-\bigskip
-\textbf{GitHub Repository:}\\
-\url{https://github.com/alexanderneva/statscoupons}
-\bigskip
-\bigskip
-All code, data, and presentation materials are available in this repository.
-\end{frame}
-
 \begin{frame}{Problem Statement}
 \textbf{Research Question:} Do transaction patterns and discount behaviors predict coupon usage?
 
@@ -518,6 +509,54 @@ Gradient Boosting & 73.62\% & \textbf{74.13\%} & +0.51\% \\
 Larger sample size improves model accuracy, with Random Forest showing greater benefit from more data.
 \end{frame}
 
+\begin{frame}{Hyperparameter Tuning (Grid Search)}
+\textbf{Grid Search Results vs Default Parameters:}
+\bigskip
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Random Forest:}
+\begin{itemize}
+    \item Best params: max\_depth=10, min\_samples\_leaf=1, n\_estimators=200
+    \item Grid Search: 73.80\% accuracy
+    \item Default: 74.60\% accuracy
+    \item Conclusion: Default params slightly better
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Gradient Boosting:}
+\begin{itemize}
+    \item Best params: learning\_rate=0.1, max\_depth=15
+    \item Grid Search: 73.68\% accuracy
+    \item Default: 73.68\% accuracy
+    \item Conclusion: Similar performance
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Hyperparameter Tuning Results (cont.)}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{SVM:}
+\begin{itemize}
+    \item Best params: C=10, gamma='auto'
+    \item Grid Search: 71.63\% accuracy
+    \item Default: 70.80\% accuracy
+    \item Conclusion: +0.8\% improvement
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Summary:}
+\begin{itemize}
+    \item Original parameters were well-tuned
+    \item Grid search did not significantly improve results
+    \item Random Forest remains best model
+    \item Default RF params (74.6\%) > Grid Search (73.8\%)
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
 \begin{frame}{Confusion Matrices}
 \begin{figure}
 \centering
@@ -576,8 +615,28 @@ Top Features:
     \item Replaced station\_code with station\_prefix for better generalization
     \item Top features: hour (15.4\%), tran\_to\_receivable\_ratio (10.5\%)
     \item 3-Fold Cross Validation confirms model stability
-    \item Future work: XGBoost/LightGBM, more feature engineering
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+\textbf{Potential Improvements:}
+\begin{itemize}
+    \item \textbf{Hyperparameter Tuning}: Grid search or random search for optimal parameters
+    \item \textbf{Advanced Models}: XGBoost, LightGBM for potentially better performance
+    \item \textbf{Feature Engineering}: More customer behavior features, time-series patterns
+    \item \textbf{Class Imbalance}: Explore SMOTE, undersampling techniques
+    \item \textbf{Deployment}: Build API for real-time coupon prediction
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Repository}
+\bigskip
+\textbf{GitHub Repository:}\\
+\textcolor{blue}{\url{https://github.com/alexanderneva/statscoupons}}\\
+\bigskip
+\bigskip
+All code, data, and presentation materials are available in this repository.
 \end{frame}
 
 \end{document}

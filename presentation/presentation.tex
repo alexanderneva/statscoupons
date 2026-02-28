@@ -181,7 +181,6 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
     \item \texttt{classification\_report()}: Precision/Recall/F1
     \item \texttt{confusion\_matrix()}: Confusion matrix
     \item \texttt{cross\_val\_score()}: Validation
-    \item \texttt{feature\_importances\_}: Feature importance
 \end{itemize}
 \end{column}
 \end{columns}
@@ -308,7 +307,7 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \end{frame}
 
 \begin{frame}{Density Plot Analysis}
-\textbf{What is a Density Plot?}
+\textbf{Dimensionality Reduction:}
 \begin{itemize}
     \item Kernel density estimation (KDE) shows probability distribution
     \item Overlay of two classes on same axes for comparison
@@ -386,7 +385,7 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 
 \section{Models}
 
-\begin{frame}[allowframebreaks]{Model Architecture}
+\begin{frame}{Model Architecture}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \textbf{Random Forest Parameters:}
@@ -437,13 +436,13 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
     \item BatchNormalization + Dropout(0.3)
     \item Output Layer: 2 neurons (Softmax)
 \end{itemize}
-\bigskip
 \textbf{Training:}
 \begin{itemize}
     \item Optimizer: Adam (lr=0.001)
     \item Loss: Categorical Crossentropy
     \item Validation Split: 10\%
     \item Batch Size: 256
+    \item Epochs: 100
 \end{itemize}
 \end{frame}
 
@@ -509,7 +508,7 @@ Gradient Boosting & 73.62\% & \textbf{74.13\%} & +0.51\% \\
 Larger sample size improves model accuracy, with Random Forest showing greater benefit from more data.
 \end{frame}
 
-\begin{frame}{Hyperparameter Tuning (Grid Search)}
+\begin{frame}{Hyperparameter Tuning (Grid Search on Sample Size of 20,000)}
 \textbf{Grid Search Results vs Default Parameters:}
 \bigskip
 \begin{columns}
@@ -551,10 +550,28 @@ Larger sample size improves model accuracy, with Random Forest showing greater b
     \item Original parameters were well-tuned
     \item Grid search did not significantly improve results
     \item Random Forest remains best model
-    \item Default RF params (74.6\%) > Grid Search (73.8\%)
+    \item Default RF params (74.6\%) $>$ Grid Search (73.8\%)
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+\begin{frame}{Grid Search Results Summary}
+\begin{table}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Model & \shortstack{ROC} & \shortstack{AUC}\\
+\midrule
+  Random Forest & \textbf{73.80}\% & \textbf{82.02\%}\\
+Gradient Boosting & 73.62\% & 81.72\%\\
+Support Vecotr Machines & 71.63\% & 77.40 \% \\
+\bottomrule
+\end{tabular}
+\end{table}
+  \begin{itemize}
+    \item Not a marginal improvement on initial model performance
+    \item With more time and resources, hope to expand the grid 
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Confusion Matrices}
@@ -566,7 +583,7 @@ Larger sample size improves model accuracy, with Random Forest showing greater b
 
 \section{Feature Analysis}
 
-\begin{frame}{Feature Importance}
+\begin{frame}{Feature Importance from Random Forests}
 \begin{columns}
 \begin{column}{0.5\textwidth}
 \begin{figure}
@@ -606,7 +623,7 @@ Top Features:
 
 \section{Conclusions}
 
-\begin{frame}[allowframebreaks]{Conclusions}
+\begin{frame}{Conclusions}
 \begin{itemize}
     \item Random Forest achieves \textbf{74.60\% accuracy} with \textbf{0.825 AUC} - best model
     \item Gradient Boosting: 73.68\% accuracy, 0.818 AUC
@@ -621,7 +638,7 @@ Top Features:
 \begin{frame}{Future Work}
 \textbf{Potential Improvements:}
 \begin{itemize}
-    \item \textbf{Hyperparameter Tuning}: Grid search or random search for optimal parameters
+    \item \textbf{Hyperparameter Tuning}: Grid search or random search for optimal parameters. Explore other kernels, $C$ and $\gamma$ sizes for SVM.
     \item \textbf{Advanced Models}: XGBoost, LightGBM for potentially better performance
     \item \textbf{Feature Engineering}: More customer behavior features, time-series patterns
     \item \textbf{Class Imbalance}: Explore SMOTE, undersampling techniques

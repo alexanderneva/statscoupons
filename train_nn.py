@@ -39,7 +39,7 @@ def main():
     X_test_scaled = scaler.transform(X_test)
 
     print("\n" + "=" * 50)
-    print("Training Neural Network (5 Hidden Layers)...")
+    print("Training Neural Network...")
     print("=" * 50)
 
     gpus = tf.config.list_physical_devices("GPU")

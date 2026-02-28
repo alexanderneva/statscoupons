@@ -109,6 +109,11 @@ uv run subset_selection.py
 - `confusion_matrices.png` - Confusion matrices for all models
 - `presentation.tex` - Beamer presentation (compile with pdflatex)
 
+## Under Construction
+
+- `run_workflow.py` to streamline model changes and presentation updates
+- `grid_search&` to do hyperparameter tuning. Takes time to run.
+
 ## References
 
 Academic papers on O2O coupon prediction using XGBoost/LightGBM report AUC values of 0.95-0.99 with extensive feature engineering (26+ domain-specific features):

@@ -21,6 +21,10 @@ def load_data():
     print("Loading data files...")
 
     wallet_df = pd.read_csv("cust_wallet_detail_train.csv")
+    wallet_df["station_prefix"] = wallet_df["station_code"].astype(str).str[:3]
+    prefix_map = {p: i for i, p in enumerate(wallet_df["station_prefix"].unique())}
+    wallet_df["station_prefix_encoded"] = wallet_df["station_prefix"].map(prefix_map)
+
     coupon_used_df = pd.read_csv("cust_coupon_detail_used_train.csv")
     coupon_send_df = pd.read_csv("cust_coupon_detail_send_train.csv")
 
@@ -71,7 +75,7 @@ def load_data():
     df = extract_time_features(df)
 
     feature_cols = [
-        "station_code",
+        "station_prefix_encoded",
         "tran_amt",
         "receivable_amt",
         "discounts_amt",
@@ -110,7 +114,7 @@ def load_data():
     ]
 
     OPTIMAL_FEATURES = [
-        "station_code",
+        "station_prefix_encoded",
         "attributionorgcode",
         "hour",
         "tran_amt",

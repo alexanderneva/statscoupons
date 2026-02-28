@@ -92,6 +92,73 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \textbf{Target Variable:} \texttt{coupon\_used} (Binary: 1 = Used, 0 = Not Used)
 \end{frame}
 
+\begin{frame}{Sample Data: Raw Input}
+\begin{table}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+membercode & tran\_amt & discounts\_amt & coupon\_used \\
+\midrule
+M001 & 150.00 & 20.00 & 1 \\
+M002 & 85.50 & 10.00 & 0 \\
+M003 & 220.00 & 35.00 & 1 \\
+M004 & 60.00 & 5.00 & 0 \\
+M005 & 180.00 & 25.00 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Sample Data: Engineered Features}
+\begin{table}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
+\midrule
+150.00 & 20.00 & 0.133 & 0.133 & 13.3\% \\
+85.50 & 10.00 & 0.117 & 0.117 & 11.7\% \\
+220.00 & 35.00 & 0.159 & 0.159 & 15.9\% \\
+60.00 & 5.00 & 0.083 & 0.083 & 8.3\% \\
+180.00 & 25.00 & 0.139 & 0.139 & 13.9\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{frame}
+
+\begin{frame}{Key Libraries}
+\begin{itemize}
+    \item \textbf{pandas}: Data manipulation and analysis
+    \item \textbf{numpy}: Numerical computations
+    \item \textbf{sklearn}: Machine learning models and evaluation
+    \item \textbf{tensorflow}: Neural network implementation
+    \item \textbf{ matplotlib}, \textbf{seaborn}: Data visualization
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Key Functions}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Data Processing:}
+\begin{itemize}
+    \item \texttt{pd.read\_csv()}: Load datasets
+    \item \texttt{df.merge()}: Join datasets
+    \item \texttt{df.drop()}: Remove columns
+    \item \texttt{df.quantile()}: Outlier removal
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Modeling:}
+\begin{itemize}
+    \item \texttt{train\_test\_split()}: Split data
+    \item \texttt{GradientBoostingClassifier()}: Build model
+    \item \texttt{cross\_val\_score()}: Validate
+    \item \texttt{feature\_importances\_}: Get importance
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
 \section{Data Preprocessing}
 
 \begin{frame}[allowframebreaks]{Data Preprocessing}
@@ -146,73 +213,99 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \textbf{Impact:} Removing \texttt{membercode} improved accuracy from 64\% to 66\%
 \end{frame}
 
-\section{Function Definition and Implementation}
-
-\begin{frame}{Key Libraries}
+\begin{frame}{Feature Engineering: Station Code}
+\textbf{Problem: High-cardinality numeric feature}
 \begin{itemize}
-    \item \textbf{pandas}: Data manipulation and analysis
-    \item \textbf{numpy}: Numerical computations
-    \item \textbf{sklearn}: Machine learning models and evaluation
-    \item \textbf{tensorflow}: Neural network implementation
-    \item \textbf{ matplotlib}, \textbf{seaborn}: Data visualization
+    \item \texttt{station\_code}: 18,806 unique values (treated as numeric)
+    \item PCA showed it dominated variance (54\% on PC1)
+    \item 23.5\% feature importance - but likely overfitting
+\end{itemize}
+\bigskip
+\textbf{Discovery: Extract station prefix}
+\begin{itemize}
+    \item First 3 digits = store channel/region
+    \item Only 19 unique values
+    \item Different prefixes show 22-54\% coupon usage rates
+\end{itemize}
+\bigskip
+\textbf{Experiment Results (Random Forest):}
+\begin{itemize}
+    \item Current (station\_code): 74.2\% accuracy
+    \item Removed station\_code: 74.4\% accuracy
+    \item Replaced with station\_prefix: \textbf{74.6\% accuracy}
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Sample Data: Raw Input}
-\begin{table}
+\section{Visualization}
+
+\begin{frame}{Correlation Matrix Heatmap}
+\begin{figure}
 \centering
-\begin{tabular}{lrrr}
-\toprule
-membercode & tran\_amt & discounts\_amt & coupon\_used \\
-\midrule
-M001 & 150.00 & 20.00 & 1 \\
-M002 & 85.50 & 10.00 & 0 \\
-M003 & 220.00 & 35.00 & 1 \\
-M004 & 60.00 & 5.00 & 0 \\
-M005 & 180.00 & 25.00 & 1 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=0.7\textwidth]{../images/correlation_matrix.png}
+\end{figure}
 \end{frame}
 
-\begin{frame}{Sample Data: Engineered Features}
-\begin{table}
-\centering
-\begin{tabular}{lrrrr}
-\toprule
-tran\_amt & discounts\_amt & benefit\_ratio & discount\_ratio & savings\_pct \\
-\midrule
-150.00 & 20.00 & 0.133 & 0.133 & 13.3\% \\
-85.50 & 10.00 & 0.117 & 0.117 & 11.7\% \\
-220.00 & 35.00 & 0.159 & 0.159 & 15.9\% \\
-60.00 & 5.00 & 0.083 & 0.083 & 8.3\% \\
-180.00 & 25.00 & 0.139 & 0.139 & 13.9\% \\
-\bottomrule
-\end{tabular}
-\end{table}
-\end{frame}
-
-\begin{frame}{Key Functions}
+\begin{frame}{Dimensionality Reduction}
 \begin{columns}
 \begin{column}{0.5\textwidth}
-\textbf{Data Processing:}
+\textbf{Density Comparison:}
 \begin{itemize}
-    \item \texttt{pd.read\_csv()}: Load datasets
-    \item \texttt{df.merge()}: Join datasets
-    \item \texttt{df.drop()}: Remove columns
-    \item \texttt{df.quantile()}: Outlier removal
+    \item Kernel density overlay of transaction amount vs hour
+    \item Shows where each class concentrates
 \end{itemize}
 \end{column}
 \begin{column}{0.5\textwidth}
-\textbf{Modeling:}
+\textbf{t-SNE Visualization:}
 \begin{itemize}
-    \item \texttt{train\_test\_split()}: Split data
-    \item \texttt{GradientBoostingClassifier()}: Build model
-    \item \texttt{cross\_val\_score()}: Validate
-    \item \texttt{feature\_importances\_}: Get importance
+    \item Non-linear embedding
+    \item Preserves local structure
 \end{itemize}
 \end{column}
 \end{columns}
+\begin{figure}
+\centering
+\includegraphics[width=0.85\textwidth]{../images/dimensionality_reduction.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}[allowframebreaks]{PCA Visualization}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{../images/pca_visualization.png}
+\end{figure}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Key insight: station\_code prefix matters}
+\begin{itemize}
+    \item Raw station\_code: 18K unique (acts like ID)
+    \item Prefix (first 3 digits): 19 unique groups
+    \item Prefix shows clear coupon usage patterns:
+    \begin{itemize}
+        \item 331, 310, 328: ~52\% usage
+        \item 334, 335: ~22\% usage
+    \end{itemize}
+    \item Likely represents store channel/region
+\end{itemize}
+\end{column}
+\end{columns}
+\framebreak
+
+\textbf{What the PCA shows:}
+\begin{itemize}
+    \item Vertical bands = different station prefixes
+    \item PC1 (54\%) captures station prefix
+    \item PC2 (46\%) captures transaction amount
+    \item Within each band: classes overlap significantly
+    \item Station prefix is the key differentiator
+\end{itemize}
+\bigskip
+\textbf{Implication for model:}
+\begin{itemize}
+    \item Feature engineering: extract station prefix
+    \item Station/channel is more predictive than transaction amount
+\end{itemize}
 \end{frame}
 
 \section{Models}
@@ -310,66 +403,11 @@ Gradient Boosting & 73.62\% & \textbf{74.13\%} & +0.51\% \\
 Larger sample size improves model accuracy, with Random Forest showing greater benefit from more data.
 \end{frame}
 
-\begin{frame}[allowframebreaks]{Confusion Matrices}
-
-\textbf{Random Forest (Accuracy: 74.22\%):}
-\[
-\begin{bmatrix}
-\sim 2100 & \sim 440 \\
-\sim 580 & \sim 880
-\end{bmatrix}
-\]
-\begin{center}
-\begin{tabular}{lcc}
-\toprule
-  & Predicted: No & Predicted: Yes \\
-\midrule
-Actual: No & ~2100 (TN) & ~440 (FP) \\
-Actual: Yes & ~580 (FN) & ~880 (TP) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\pagebreak
-
-\textbf{Gradient Boosting (Accuracy: 73.62\%):}
-\[
-\begin{bmatrix}
-\sim 2080 & \sim 460 \\
-\sim 590 & \sim 870
-\end{bmatrix}
-\]
-\begin{center}
-\begin{tabular}{lcc}
-\toprule
-  & Predicted: No & Predicted: Yes \\
-\midrule
-Actual: No & ~2080 (TN) & ~460 (FP) \\
-Actual: Yes & ~590 (FN) & ~870 (TP) \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-\pagebreak
-
-\textbf{Neural Network (Accuracy: 71.85\%, Recall: 58.11\%):}
-\[
-\begin{bmatrix}
-2025 & 514 \\
-612 & 849
-\end{bmatrix}
-\]
-\begin{center}
-\begin{tabular}{lcc}
-\toprule
-  & Predicted: No & Predicted: Yes \\
-\midrule
-Actual: No & 2025 (TN) & 514 (FP) \\
-Actual: Yes & 612 (FN) & 849 (TP) \\
-\bottomrule
-\end{tabular}
-\end{center}
-Neural Network improved with balanced class weights.
+\begin{frame}{Confusion Matrices}
+\begin{figure}
+\centering
+\includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{../images/confusion_matrices.png}
+\end{figure}
 \end{frame}
 
 \section{Feature Analysis}
@@ -408,45 +446,6 @@ Top Features:
     \item Averaged across all 100 decision trees
     \item Higher value = more predictive power
 \end{itemize}
-\end{frame}
-
-\section{Visualization}
-
-\begin{frame}{Correlation Matrix Heatmap}
-\begin{figure}
-\centering
-\includegraphics[width=0.7\textwidth]{../images/correlation_matrix.png}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Dimensionality Reduction}
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\textbf{Density Comparison:}
-\begin{itemize}
-    \item Kernel density overlay of transaction amount vs hour
-    \item Shows where each class concentrates
-\end{itemize}
-\end{column}
-\begin{column}{0.5\textwidth}
-\textbf{t-SNE Visualization:}
-\begin{itemize}
-    \item Non-linear embedding
-    \item Preserves local structure
-\end{itemize}
-\end{column}
-\end{columns}
-\begin{figure}
-\centering
-\includegraphics[width=0.85\textwidth]{../images/dimensionality_reduction.png}
-\end{figure}
-\end{frame}
-
-\begin{frame}{PCA Visualization}
-\begin{figure}
-\centering
-\includegraphics[width=0.65\textwidth,height=0.65\textheight,keepaspectratio]{../images/pca_visualization.png}
-\end{figure}
 \end{frame}
 
 \section{Conclusions}

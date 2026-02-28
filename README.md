@@ -26,10 +26,11 @@ This will extract the following CSV files:
 
 ## Features
 
-- **Original**: Transaction amounts, customer IDs, store codes, time features
+- **Original**: Transaction amounts, customer IDs, station prefix, time features
 - **Engineered**: Benefit ratios, discount ratios, savings percentages
 - **Aggregated**: Coupon usage counts and amounts per customer (from merged data)
 - **Optimized**: Reduced from 23 to 15 features based on importance analysis
+- **Key finding**: Replaced station_code (18K values) with station_prefix (19 values) for better generalization
 
 ### Feature Selection
 
@@ -69,6 +70,12 @@ uv run python train_model.py
 # Generate visualizations (LDA, t-SNE, feature importance)
 uv run python visualize.py
 
+# Generate PCA visualization (excluding time features)
+uv run python visualize_pca.py
+
+# Generate confusion matrix plots
+uv run python visualize_confusion_matrices.py
+
 # Run tuned model
 uv run python tune_model.py
 ```
@@ -76,9 +83,10 @@ uv run python tune_model.py
 ## Output Files
 
 - `dimensionality_reduction.png` - Density comparison and t-SNE visualizations
-- `pca_visualization.png` - PCA visualization of the data
+- `pca_visualization.png` - PCA visualization (transaction/behavioral features only)
 - `feature_importance.png` - Random Forest feature importance chart
 - `correlation_matrix.png` - Feature correlation heatmap
+- `confusion_matrices.png` - Confusion matrices for all models
 - `presentation.tex` - Beamer presentation (compile with pdflatex)
 
 ## References

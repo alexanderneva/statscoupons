@@ -112,7 +112,7 @@ uv run subset_selection.py
 ## Under Construction
 
 - `run_workflow.py` to streamline model changes and presentation updates
-- `grid_search&` to do hyperparameter tuning. Takes time to run.
+- `grid_search*` to do hyperparameter tuning. Takes time to run.
 
 ## References
 

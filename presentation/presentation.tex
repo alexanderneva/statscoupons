@@ -157,6 +157,69 @@ Coupon Distribution & 211,712 & Coupons sent to customers \\
 \end{columns}
 \end{frame}
 
+\begin{frame}{Key Functions (sklearn)}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Data Split:}
+\begin{itemize}
+    \item \texttt{train\_test\_split()}: Split data (80/20)
+    \item \texttt{StratifiedKFold()}: 3-fold CV
+    \item \texttt{StandardScaler()}: Feature normalization
+\end{itemize}
+\bigskip
+\textbf{Dimensionality Reduction:}
+\begin{itemize}
+    \item \texttt{PCA()}: Principal component analysis
+    \item \texttt{TSNE()}: t-SNE embedding
+    \item \texttt{KernelDensity()}: Density estimation
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Model Evaluation:}
+\begin{itemize}
+    \item \texttt{accuracy\_score()}: Accuracy metric
+    \item \texttt{roc\_auc\_score()}: AUC metric
+    \item \texttt{classification\_report()}: Precision/Recall/F1
+    \item \texttt{confusion\_matrix()}: Confusion matrix
+    \item \texttt{cross\_val\_score()}: Validation
+    \item \texttt{feature\_importances\_}: Feature importance
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Key Functions (matplotlib, seaborn, tensorflow)}
+\begin{columns}
+\begin{column}{0.5\textwidth}
+\textbf{Model Training:}
+\begin{itemize}
+    \item \texttt{RandomForestClassifier()}: Random Forest
+    \item \texttt{GradientBoostingClassifier()}: Gradient Boosting
+    \item \texttt{SVC()}: Support Vector Machine
+    \item \texttt{LogisticRegression()}: Logistic Regression
+\end{itemize}
+\textbf{Visualization (matplotlib, seaborn):}
+\begin{itemize}
+    \item \texttt{plt.savefig()}: Save plots
+    \item \texttt{sns.heatmap()}: Correlation heatmap
+    \item \texttt{ConfusionMatrixDisplay()}: Confusion matrices
+\end{itemize}
+\end{column}
+\begin{column}{0.5\textwidth}
+\textbf{Neural Network (tensorflow):}
+\begin{itemize}
+    \item \texttt{keras.Sequential()}: Build model
+    \item \texttt{layers.Dense()}: Dense layers
+    \item \texttt{layers.BatchNormalization()}: Batch norm
+    \item \texttt{layers.Dropout()}: Dropout
+    \item \texttt{model.compile()}: Compile model
+    \item \texttt{model.fit()}: Train model
+    \item \texttt{model.predict()}: Predictions
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
 \section{Data Preprocessing}
 
 \begin{frame}[allowframebreaks]{Data Preprocessing}

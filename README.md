@@ -71,22 +71,22 @@ Encoded: station_code to station_prefix_encoded
 
 ```bash
 # Train the model
-uv run python train_model.py
+uv run train_model.py
 
 # Run neural netowrk
-uv run python train_nn.py
+uv run train_nn.py
 
 # Generate visualizations (LDA, t-SNE, feature importance)
-uv run python visualize.py
+uv run visualize.py
 
 # Generate PCA visualization (excluding time features)
-uv run python visualize_pca.py
+uv run visualize_pca.py
 
 # Generate confusion matrix plots
-uv run python visualize_confusion_matrices.py
+uv run visualize_confusion_matrices.py
 
 # Tune model
-uv run python tune_model.py
+uv run tune_model.py
 
 # Employ Grid search
 uv run grid_search.py
